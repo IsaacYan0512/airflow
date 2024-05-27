@@ -12,6 +12,7 @@ services:
     networks:
       - airflow_network
 
+
   redis:
     image: bitnami/redis:latest
     volumes:
@@ -31,6 +32,9 @@ services:
       - AIRFLOW__CORE__SECRET_KEY=a25mQ1FHTUh3MnFRSk5KMEIyVVU2YmN0VGRyYTVXY08=
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://bn_airflow:bitnami1@postgresql:5432/bitnami_airflow
       - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+      - CLICKSEND_USERNAME=dojobnow.dev@gmail.com
+      - CLICKSEND_PASSWORD=E95FF386-79CA-8592-99A6-5B93D0E99E29
+      - CLICKSEND_EMAIL_FROM_ID=29000
       - POSTGRES_HOST=postgresql
       - POSTGRES_PORT=5432
       - POSTGRES_DB=bitnami_airflow
@@ -55,6 +59,9 @@ services:
       - AIRFLOW__CORE__SECRET_KEY=a25mQ1FHTUh3MnFRSk5KMEIyVVU2YmN0VGRyYTVXY08=
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://bn_airflow:bitnami1@postgresql:5432/bitnami_airflow
       - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+      - CLICKSEND_USERNAME=dojobnow.dev@gmail.com
+      - CLICKSEND_PASSWORD=E95FF386-79CA-8592-99A6-5B93D0E99E29
+      - CLICKSEND_EMAIL_FROM_ID=29000
       - POSTGRES_HOST=postgresql
       - POSTGRES_PORT=5432
       - POSTGRES_DB=bitnami_airflow
@@ -81,6 +88,9 @@ services:
       - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
       - AIRFLOW_PASSWORD=bitnami
       - AIRFLOW_USERNAME=user
+      - CLICKSEND_USERNAME=dojobnow.dev@gmail.com
+      - CLICKSEND_PASSWORD=E95FF386-79CA-8592-99A6-5B93D0E99E29
+      - CLICKSEND_EMAIL_FROM_ID=29000
       - POSTGRES_HOST=postgresql
       - POSTGRES_PORT=5432
       - POSTGRES_DB=bitnami_airflow
