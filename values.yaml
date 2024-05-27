@@ -1,0 +1,78 @@
+executor: CeleryExecutor
+
+config:
+  AIRFLOW__CORE__EXECUTOR:
+    value: "CeleryExecutor"
+  AIRFLOW__CORE__FERNET_KEY:
+    value: "46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho="
+  AIRFLOW__CORE__SECRET_KEY:
+    value: "a25mQ1FHTUh3MnFRSk5KMEIyVVU2YmN0VGRyYTVXY08="
+  AIRFLOW__CORE__LOAD_EXAMPLES:
+    value: "false"
+
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: bitnami1
+    username: bn_airflow
+    password: bitnami1
+    database: bitnami_airflow
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Redis Configuration
+redis:
+  enabled: true
+  password: ""
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Airflow Webserver
+web:
+  defaultUser:
+    enabled: true
+    username: user
+    password: bitnami
+
+# DAGs configuration
+dags:
+  gitSync:
+    enabled: false
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Logs configuration
+logs:
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Environment Variables
+env:
+  - name: POSTGRES_HOST
+    value: "postgresql"
+  - name: POSTGRES_PORT
+    value: "5432"
+  - name: POSTGRES_DB
+    value: "bitnami_airflow"
+  - name: POSTGRES_USER
+    value: "bn_airflow"
+  - name: POSTGRES_PASSWORD
+    value: "bitnami1"
+
+workers:
+  replicas: 1
+
+scheduler:
+  replicas: 1
+
+flower:
+  enabled: true
+
+persistence:
+  enabled: true
+  size: 10Gi
