@@ -8,6 +8,12 @@ import os
 from jinja2 import Environment, FileSystemLoader
 from airflow.models import Variable
 
+POSTGRES_DB = Variable.get("POSTGRES_DB")
+POSTGRES_USER = Variable.get("POSTGRES_USER")
+POSTGRES_PASSWORD = Variable.get("POSTGRES_PASSWORD")
+POSTGRES_HOST = Variable.get("POSTGRES_HOST")
+POSTGRES_PORT = Variable.get("POSTGRES_PORT")
+
 def fetch_unlogged_users(**kwargs):
     print("Connecting to database...")
     conn = psycopg2.connect(
