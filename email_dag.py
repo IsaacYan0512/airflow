@@ -62,7 +62,7 @@ def send_email(**kwargs):
         body = template.render(username=user['username'])
         try:
             # 尝试发送邮件
-            mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body,from_email_address_id=clicksend_email_from_id)
+            mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body)
             print(f"Email sent to {user['email']}")
         except Exception as e:
             print(f"Failed to send email to {user['email']}: {str(e)}")
