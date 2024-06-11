@@ -4,24 +4,17 @@ from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 import psycopg2
 from clicksend_mailer import ClickSendMailer
-import os
 from jinja2 import Environment, FileSystemLoader
 from airflow.models import Variable
-
-POSTGRES_DB = Variable.get("POSTGRES_DB")
-POSTGRES_USER = Variable.get("POSTGRES_USER")
-POSTGRES_PASSWORD = Variable.get("POSTGRES_PASSWORD")
-POSTGRES_HOST = Variable.get("POSTGRES_HOST")
-POSTGRES_PORT = Variable.get("POSTGRES_PORT")
 
 def fetch_unlogged_users(**kwargs):
     print("Connecting to database...")
     conn = psycopg2.connect(
-        dbname=os.getenv('POSTGRES_DB'),
-        user=os.getenv('POSTGRES_USER'),
-        password=os.getenv('POSTGRES_PASSWORD'),
-        host=os.getenv('POSTGRES_HOST'),
-        port=os.getenv('POSTGRES_PORT')
+        dbname=Variable.get('POSTGRES_DB'),
+        user=Variable.get('POSTGRES_USER'),
+        password=Variable.get('POSTGRES_PASSWORD'),
+        host=Variable.get('POSTGRES_HOST'),
+        port=Variable.get('POSTGRES_PORT')
     )
     cursor = conn.cursor()
     print("Executing query...")
@@ -44,13 +37,11 @@ def fetch_unlogged_users(**kwargs):
 def send_email(**kwargs):
     ti = kwargs['ti']
 
-
     clicksend_username = Variable.get("CLICKSEND_USERNAME")
     clicksend_password = Variable.get("CLICKSEND_PASSWORD")
     print(f"Using ClickSend username: {clicksend_username}")
     print(f"Using ClickSend password: {clicksend_password}")
-    
-    
+
     users = ti.xcom_pull(task_ids='fetch_unlogged_users', key='unlogged_users')
     if not users:
         print("No users to email.")
@@ -66,7 +57,6 @@ def send_email(**kwargs):
     for user in users:
         body = template.render(username=user['username'])
         try:
-            # 尝试发送邮件
             mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body)
             print(f"Email sent to {user['email']}")
         except Exception as e:
