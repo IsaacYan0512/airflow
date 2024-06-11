@@ -37,10 +37,12 @@ def fetch_unlogged_users(**kwargs):
 def send_email(**kwargs):
     ti = kwargs['ti']
 
+
     clicksend_username = Variable.get("CLICKSEND_USERNAME")
     clicksend_password = Variable.get("CLICKSEND_PASSWORD")
     print(f"Using ClickSend username: {clicksend_username}")
     print(f"Using ClickSend password: {clicksend_password}")
+
 
     users = ti.xcom_pull(task_ids='fetch_unlogged_users', key='unlogged_users')
     if not users:
@@ -48,7 +50,7 @@ def send_email(**kwargs):
         return 'skip_email'
 
     mailer = ClickSendMailer()
-    
+
     subject = "Reminder: Have you logged in recently?"
     template_loader = FileSystemLoader('/opt/airflow/dags/repo/templates')
     template_env = Environment(loader=template_loader)
@@ -57,6 +59,7 @@ def send_email(**kwargs):
     for user in users:
         body = template.render(username=user['username'])
         try:
+            # 尝试发送邮件
             mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body)
             print(f"Email sent to {user['email']}")
         except Exception as e:
