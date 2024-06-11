@@ -275,16 +275,10 @@ env: []
 #   value: ""
 
 # Volumes for all airflow containers
-volumes: 
-  - name: templates-volume
-    hostPath:
-      path: /home/ubuntu/dags/templates
-      type: Directory
+volumes: []
 
 # VolumeMounts for all airflow containers
-volumeMounts:
-  - name: templates-volume
-    mountPath: /opt/airflow/dags/repo/templates
+volumeMounts: []
 
 # Secrets for all airflow containers
 secret: []
