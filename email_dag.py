@@ -40,9 +40,11 @@ def send_email(**kwargs):
 
     clicksend_username = Variable.get("CLICKSEND_USERNAME")
     clicksend_password = Variable.get("CLICKSEND_PASSWORD")
+    clicksend_email_address_id = Variable.get("CLICKSEND_EMAIL_ADDRESS_ID")
+
     print(f"Using ClickSend username: {clicksend_username}")
     print(f"Using ClickSend password: {clicksend_password}")
-
+    print(f"Using ClickSend email address ID: {clicksend_email_address_id}")
 
     users = ti.xcom_pull(task_ids='fetch_unlogged_users', key='unlogged_users')
     if not users:
@@ -60,7 +62,7 @@ def send_email(**kwargs):
         body = template.render(username=user['username'])
         try:
             # 尝试发送邮件
-            mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body)
+            mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body,from_email_address_id=clicksend_email_address_id)
             print(f"Email sent to {user['email']}")
         except Exception as e:
             print(f"Failed to send email to {user['email']}: {str(e)}")
