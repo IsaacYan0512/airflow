@@ -50,7 +50,7 @@ def send_email(**kwargs):
     mailer = ClickSendMailer()
     
     subject = "Reminder: Have you logged in recently?"
-    template_loader = FileSystemLoader('/home/ubuntu/dags/templates')
+    template_loader = FileSystemLoader('/opt/airflow/dags/repo/templates')
     template_env = Environment(loader=template_loader)
     template = template_env.get_template('welcome.html')
 
