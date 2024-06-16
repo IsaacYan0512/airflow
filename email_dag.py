@@ -89,7 +89,7 @@ with DAG(
         "retry_delay": timedelta(minutes=5),
     },
     description="A simple email_test DAG",
-    schedule_interval=timedelta(days=1),
+    schedule_interval=timedelta(days=7),
     start_date=datetime(2021, 1, 1),
     catchup=False,
     tags=["example"],
