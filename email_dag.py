@@ -12,8 +12,8 @@ def image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-def generate_email_with_base64_image(template_path, image_path, image_placeholder):
-    env = Environment(loader=FileSystemLoader('/'))
+def generate_email_with_base64_image(template_path, image_path):
+    env = Environment(loader=FileSystemLoader('/opt/airflow/dags/repo/templates'))
     template = env.get_template(template_path)
     
     image_base64 = image_to_base64(image_path)
@@ -67,11 +67,11 @@ def send_email(**kwargs):
     mailer = ClickSendMailer()
 
     subject = "Reminder: Have you logged in recently?"
-    body = generate_email_with_base64_image('/opt/airflow/dags/repo/templates/reminder.html', 
-                                            '/opt/airflow/dags/repo/templates/logo2.png', 
-                                            'src="logo2.png"')
+    template_path = 'reminder.html'
+    image_path = '/opt/airflow/dags/repo/templates/logo2.png'
 
     for user in users:
+        body = generate_email_with_base64_image(template_path, image_path).replace('{{ username }}', user['username'])
         try:
             mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body)
             print(f"Email sent to {user['email']}")
