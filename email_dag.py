@@ -1,36 +1,26 @@
-from airflow import DAG
 import base64
+from jinja2 import Environment, FileSystemLoader
+from airflow import DAG
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 import psycopg2
-from clicksend_mailer import ClickSendMailer
 from airflow.models import Variable
-from jinja2 import Environment, FileSystemLoader
+from clicksend_mailer import ClickSendMailer
 
-# 包含生成Base64图片并插入HTML模板的函数
 def image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-def replace_image_with_base64(html_content, image_path, image_placeholder):
+def generate_email_with_base64_image(template_path, image_path, image_placeholder):
+    env = Environment(loader=FileSystemLoader('/'))
+    template = env.get_template(template_path)
+    
     image_base64 = image_to_base64(image_path)
     image_base64_tag = f"data:image/png;base64,{image_base64}"
-    return html_content.replace(image_placeholder, image_base64_tag)
+    
+    return template.render(image_placeholder=image_base64_tag)
 
-def generate_email_with_base64_image(template_path, image_path, output_path, image_placeholder):
-    env = Environment(loader=FileSystemLoader('/opt/airflow/dags/repo/templates'))
-    template = env.get_template(template_path)
-
-    html_content = template.render()
-    modified_html_content = replace_image_with_base64(html_content, image_path, image_placeholder)
-
-    with open(output_path, "w") as file:
-        file.write(modified_html_content)
-
-    print("HTML email template with Base64 encoded image generated successfully.")
-
-# 定义fetch_unlogged_users函数
 def fetch_unlogged_users(**kwargs):
     print("Connecting to database...")
     conn = psycopg2.connect(
@@ -58,16 +48,6 @@ def fetch_unlogged_users(**kwargs):
     cursor.close()
     conn.close()
 
-# 定义生成HTML模板的函数
-def generate_email_template():
-    template_path = 'welcome.html'
-    image_path = '/opt/airflow/dags/repo/templates/logo2.png'
-    output_path = '/opt/airflow/dags/repo/templates/reminder.html'
-    image_placeholder = 'src="logo2.png"'
-
-    generate_email_with_base64_image(template_path, image_path, output_path, image_placeholder)
-
-# 定义发送邮件的函数
 def send_email(**kwargs):
     ti = kwargs['ti']
 
@@ -87,12 +67,11 @@ def send_email(**kwargs):
     mailer = ClickSendMailer()
 
     subject = "Reminder: Have you logged in recently?"
-    template_loader = FileSystemLoader('/opt/airflow/dags/repo/templates')
-    template_env = Environment(loader=template_loader)
-    template = template_env.get_template('reminder.html')
+    body = generate_email_with_base64_image('/opt/airflow/dags/repo/templates/reminder.html', 
+                                            '/opt/airflow/dags/repo/templates/logo2.png', 
+                                            'src="logo2.png"')
 
     for user in users:
-        body = template.render(username=user['username'])
         try:
             mailer.send_email(to_email=user['email'], to_name=user['username'], subject=subject, body=body)
             print(f"Email sent to {user['email']}")
@@ -101,7 +80,6 @@ def send_email(**kwargs):
 
     return 'send_email'
 
-# 定义决定是否发送邮件的函数
 def decide_to_email(**kwargs):
     ti = kwargs['ti']
     users = ti.xcom_pull(task_ids='fetch_unlogged_users', key='unlogged_users')
@@ -110,7 +88,6 @@ def decide_to_email(**kwargs):
     else:
         return 'send_email'
 
-# 定义Airflow DAG
 with DAG(
     "email_testing",
     default_args={
@@ -133,11 +110,6 @@ with DAG(
         python_callable=fetch_unlogged_users
     )
 
-    generate_template_task = PythonOperator(
-        task_id='generate_email_template',
-        python_callable=generate_email_template
-    )
-
     decide_to_email_task = BranchPythonOperator(
         task_id='decide_to_email',
         python_callable=decide_to_email,
@@ -154,4 +126,4 @@ with DAG(
         task_id='skip_email'
     )
 
-    t1 >> generate_template_task >> decide_to_email_task >> [send_email_task, skip_email]
+    t1 >> decide_to_email_task >> [send_email_task, skip_email]
