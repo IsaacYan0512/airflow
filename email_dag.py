@@ -67,7 +67,7 @@ def send_email(**kwargs):
     mailer = ClickSendMailer()
 
     subject = "Reminder: Have you logged in recently?"
-    template_path = 'reminder.html'
+    template_path = '/opt/airflow/dags/repo/templates/welcome.html'
     image_path = '/opt/airflow/dags/repo/templates/logo2.png'
 
     for user in users:
