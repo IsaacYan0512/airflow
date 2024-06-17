@@ -4,8 +4,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 import psycopg2
 from clicksend_mailer import ClickSendMailer
-from jinja2 import Environment, FileSystemLoader
 from airflow.models import Variable
+import os
 
 def fetch_unlogged_users(**kwargs):
     print("Connecting to database...")
@@ -34,9 +34,16 @@ def fetch_unlogged_users(**kwargs):
     cursor.close()
     conn.close()
 
+def generate_email_template():
+    template_path = 'welcome.html'
+    image_path = '/opt/airflow/dags/repo/logo2.png'
+    output_path = '/opt/airflow/dags/repo/templates/reminder.html'
+    image_placeholder = 'src="logo2.png"'
+
+    generate_email_with_base64_image(template_path, image_path, output_path, image_placeholder)
+
 def send_email(**kwargs):
     ti = kwargs['ti']
-
 
     clicksend_username = Variable.get("CLICKSEND_USERNAME")
     clicksend_password = Variable.get("CLICKSEND_PASSWORD")
@@ -100,6 +107,11 @@ with DAG(
         python_callable=fetch_unlogged_users
     )
 
+    generate_template_task = PythonOperator(
+        task_id='generate_email_template',
+        python_callable=generate_email_template
+    )
+
     decide_to_email_task = BranchPythonOperator(
         task_id='decide_to_email',
         python_callable=decide_to_email,
@@ -116,4 +128,4 @@ with DAG(
         task_id='skip_email'
     )
 
-    t1 >> decide_to_email_task >> [send_email_task, skip_email]
+    t1 >> generate_template_task >> decide_to_email_task >> [send_email_task, skip_email]
