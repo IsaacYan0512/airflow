@@ -60,7 +60,7 @@ def fetch_unlogged_users(**kwargs):
 # 定义生成HTML模板的函数
 def generate_email_template():
     template_path = 'welcome.html'
-    image_path = '/opt/airflow/dags/repo/logo2.png'
+    image_path = '/opt/airflow/dags/repo/templates/logo2.png'
     output_path = '/opt/airflow/dags/repo/templates/reminder.html'
     image_placeholder = 'src="logo2.png"'
 
