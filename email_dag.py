@@ -56,7 +56,7 @@ def send_email(**kwargs):
     subject = "Reminder: Have you logged in recently?"
     template_loader = FileSystemLoader('/opt/airflow/dags/repo/templates')
     template_env = Environment(loader=template_loader)
-    template = template_env.get_template('welcome.html')
+    template = template_env.get_template('reminder.html')
 
     for user in users:
         body = template.render(username=user['username'])
