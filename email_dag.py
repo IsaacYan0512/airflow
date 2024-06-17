@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import psycopg2
 from clicksend_mailer import ClickSendMailer
 from airflow.models import Variable
-import os
+from jinja2 import Environment, FileSystemLoader
 
 def fetch_unlogged_users(**kwargs):
     print("Connecting to database...")
