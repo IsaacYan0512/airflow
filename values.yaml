@@ -2503,8 +2503,7 @@ dags:
     # If you are using an ssh private key, you can additionally
     # specify the content of your known_hosts file, example:
     #
-    knownHosts: |
-      github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAr7T8/V6Zh9l...
+    # knownHosts: []
 
     # interval between git sync attempts in seconds
     # high values are more likely to cause DAGs to become out of sync between different components
