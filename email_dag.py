@@ -1,4 +1,5 @@
 from airflow import DAG
+import base64
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
